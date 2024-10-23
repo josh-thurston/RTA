@@ -1,14 +1,28 @@
-# Name: Invalid Process Trees in Windows
-# rta: unusual_parent.py
-# ATT&CK: T1093
-# Description: Runs several Windows core processes directly, instead of from the proper parent in Windows.
+"""
+Name: Invalid Process Trees in Windows
+RTA: unusual_parent.py
+ATT&CK: T1093
+Description:
+The unusual_parent.py script runs several Windows core processes directly, instead of from their proper parent in Windows.
+This technique simulates suspicious behavior associated with process manipulation and bypassing standard operating procedures.
+Key Features:
+- Direct Process Execution: Executes core Windows processes like `winlogon.exe`, `lsass.exe`, etc., bypassing their usual parent processes.
+- Simulates Malicious Activity: Demonstrates how attackers might manipulate process trees for nefarious purposes.
+- Windows-Specific: This script relies on Windows executables and behavior, making it specific to Windows environments.
+"""
 
 import common
 import os
 import sys
+import platform
 
 
 def main():
+    # Ensure script only runs on Windows
+    if platform.system() != 'Windows':
+        common.log("This script only runs on Windows.")
+        return common.UNSUPPORTED_RTA
+
     common.log("Running Windows processes with an unexpected parent of %s" % os.path.basename(sys.executable))
     process_names = [
         # "C:\\Windows\\System32\\smss.exe", BSOD (avoid this)

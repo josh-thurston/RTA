@@ -1,7 +1,15 @@
-# Name: Run Process from the Recycle Bin
-# rta: recycle_bin_process.py
-# ATT&CK: T1158
-# Description: Executes mock malware from the "C:\Recycler\" and "C:\$RECYCLE.BIN\" subdirectories.
+"""
+Name: Run Process from the Recycle Bin
+RTA: recycle_bin_process.py
+ATT&CK: T1158
+Description:
+The recycle_bin_process.py script simulates executing mock malware from the "C:\\Recycler\\" and "C:\\$RECYCLE.BIN\\"
+subdirectories, which are often used by attackers to hide malicious processes.
+Key Features:
+- Recycle Bin Execution: Executes processes from the Recycle Bin directories, mimicking techniques used by malware to hide in the system.
+- Simulates Process Execution: Runs an executable and command prompt (`cmd.exe`) from these hidden locations.
+- Windows-Specific: The script relies on the Windows Recycle Bin directories, making it Windows-only.
+"""
 
 import common
 import os
@@ -31,7 +39,7 @@ def main():
     ]
 
     common.log("Running commands from recycle bin in %s" % target_dir)
-    for command in commands:  # type: list[str]
+    for command in commands:
         source_path = command[0]
         arguments = command[1:]
 

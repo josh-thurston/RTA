@@ -9,7 +9,7 @@ Where possible, RTA attempts to perform the actual malicious activity described.
 # Installation
 
 ## Prerequisites
- * Python2.7
+ * Python3.8
 
 
 ## Installation Steps

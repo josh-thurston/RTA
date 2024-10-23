@@ -3,21 +3,26 @@
 # ATT&CK: T1021, T1047, T1077, T1124, T1126
 # Description: Runs various Windows commands typically used by attackers to move laterally from the local machine.
 
-from __future__ import print_function
 import re
 import sys
 import os
+import platform
 import common
 
 
 def main(remote_host=None):
+    # Check if running on Windows
+    if platform.system() != 'Windows':
+        common.log("This script only runs on Windows.")
+        return common.UNSUPPORTED_RTA
+
     remote_host = remote_host or common.find_remote_host()
     common.log("Attempting to laterally move to %s" % remote_host)
 
     remote_host = common.get_ipv4_address(remote_host)
-    common.log("Using ip address %s" % remote_host)
+    common.log("Using IP address %s" % remote_host)
 
-    # Put the hostname in quotes for WMIC, but leave it as is
+    # Put the hostname in quotes for WMIC, but leave it as is for others
     if not re.match(common.IP_REGEX, remote_host):
         wmi_node = '"{}"'.format(remote_host)
     else:
@@ -34,8 +39,8 @@ def main(remote_host=None):
         "net.exe time \\\\{host}",
         "net.exe use \\\\{host}\\admin$",
         "net.exe use \\\\{host}\\admin$ /delete",
-        "net.exe use \\\\{host}\c$",
-        "net.exe use \\\\{host}\c$ /delete",
+        "net.exe use \\\\{host}\\c$",
+        "net.exe use \\\\{host}\\c$ /delete",
     ]
 
     for command in commands:
@@ -48,19 +53,17 @@ def main(remote_host=None):
     hostname = hostname.lower()
     schtasks_host = remote_host
 
-    # Check if the account is local or a domain
-    if domain in (hostname, "NT AUTHORITY"):
+    # Check if the account is local or a domain account
+    if domain in (hostname, "nt authority"):
         common.log("Need password for remote scheduled task in workgroup. Performing instead on %s." % common.LOCAL_IP)
         schtasks_host = common.LOCAL_IP
 
     task_name = "test_task-%d" % os.getpid()
     schtask_commands = [
         r"schtasks /s {host} /delete /tn {name} /f",
-        r"schtasks /s {host} /create /SC MONTHLY /MO first /D SUN /tn {name} /tr c:\windows\system32\ipconfig.exe /f",
-
+        r"schtasks /s {host} /create /SC MONTHLY /MO first /D SUN /tn {name} /tr c:\\windows\\system32\\ipconfig.exe /f",
         r"schtasks /s {host} /run /tn {name}",
         r"schtasks /s {host} /delete /tn {name} /f",
-
     ]
 
     for command in schtask_commands:

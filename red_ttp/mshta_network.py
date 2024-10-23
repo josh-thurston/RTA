@@ -3,6 +3,7 @@
 # ATT&CK: T1170
 # Description: Generates network traffic from mshta.exe
 
+import platform
 import common
 
 HTA_FILE = common.get_path("bin", "beacon.hta")
@@ -10,6 +11,11 @@ HTA_FILE = common.get_path("bin", "beacon.hta")
 
 @common.dependencies(HTA_FILE)
 def main():
+    # Check if running on Windows
+    if platform.system() != 'Windows':
+        common.log("This script only runs on Windows.")
+        return common.UNSUPPORTED_RTA
+
     # http server will terminate on main thread exit
     # if daemon is True
     common.log("MsHta Beacon")

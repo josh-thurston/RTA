@@ -5,6 +5,7 @@
 import common
 import os
 import time
+import platform
 
 VBS = common.get_path("bin", "persistent_script.vbs")
 NAME = "rta-vbs-persistence"
@@ -12,6 +13,11 @@ NAME = "rta-vbs-persistence"
 
 @common.dependencies(common.PS_EXEC, VBS)
 def main():
+    # Check if running on Windows
+    if platform.system() != 'Windows':
+        common.log("This script only runs on Windows.")
+        return common.UNSUPPORTED_RTA
+
     common.log("Persistent Scripts")
 
     if common.check_system():
@@ -45,11 +51,10 @@ def main():
     time.sleep(30)
     common.print_file(log_file)
 
-    # Now delete the user profile
+    # Cleanup
     common.log("Cleanup", log_type="-")
     common.remove_file(log_file)
 
 
 if __name__ == "__main__":
     exit(main())
-

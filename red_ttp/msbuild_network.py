@@ -3,15 +3,20 @@
 # ATT&CK: T1127
 # Description: Generates network traffic from msbuild.exe
 
-import re
-import common
 
+import platform
+import common
 
 MS_BUILD = 'C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\msbuild.exe'
 
 
 @common.dependencies(MS_BUILD)
 def main():
+    # Check if running on Windows
+    if platform.system() != 'Windows':
+        common.log("This script only runs on Windows.")
+        return common.UNSUPPORTED_RTA
+
     common.log("MsBuild Beacon")
     server, ip, port = common.serve_web()
     common.clear_web_cache()

@@ -5,13 +5,19 @@
 
 import common
 import time
+import platform
 
 
 def main():
+    # Check if running on Windows
+    if platform.system() != 'Windows':
+        common.log("This script only runs on Windows.")
+        return common.UNSUPPORTED_RTA
+
     warning = "Deleting the backup catalog may have unexpected consequences. Operational issues are unknown."
     common.log("WARNING: %s" % warning, log_type="!")
     time.sleep(5)
-
+    # Execute the wbadmin command to delete the catalog
     common.execute(["wbadmin", "delete", "catalog", "-quiet"])
 
 

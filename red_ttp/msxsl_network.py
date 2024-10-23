@@ -3,6 +3,7 @@
 # ATT&CK: T1127
 # Description: Generates network traffic from msxsl.exe
 
+import platform
 import common
 
 MS_XSL = common.get_path("bin", "msxsl.exe")
@@ -12,6 +13,11 @@ XSL_FILE = common.get_path("bin", "cscript.xsl")
 
 @common.dependencies(MS_XSL, XML_FILE, XSL_FILE)
 def main():
+    # Check if running on Windows
+    if platform.system() != 'Windows':
+        common.log("This script only runs on Windows.")
+        return common.UNSUPPORTED_RTA
+
     common.log("MsXsl Beacon")
     server, ip, port = common.serve_web()
     common.clear_web_cache()
@@ -26,4 +32,3 @@ def main():
 
 if __name__ == "__main__":
     exit(main())
-

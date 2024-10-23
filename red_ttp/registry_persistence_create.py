@@ -1,10 +1,21 @@
-# Name: Registry persistence creation
-# rta: registry_persistence_create.py
-# ATT&CK: T1015, T1103
-# Description: Creates registry persistence for mock malware in Run and RunOnce keys, Services and debuggers.
+"""
+Name: Registry Persistence Creation
+RTA: registry_persistence_create.py
+ATT&CK: T1015, T1103
+Description:
+The registry_persistence_create.py script creates registry persistence for mock malware in Run and RunOnce keys,
+services, and debuggers. This technique mimics how attackers establish persistence via registry modifications.
+Key Features:
+- Run/RunOnce Key Persistence: Adds entries to the Windows Run and RunOnce keys to execute programs during startup.
+- Service Key Creation: Creates a registry service entry under SYSTEM for a mock service, simulating persistence through services.
+- AppInit DLL Injection: Simulates persistence by adding an AppInit DLL entry, a common tactic used for injecting malware at startup.
+- Debugger Hijacking: Adds registry entries to Image File Execution Options for key Windows utilities to hijack their execution.
+- Windows-Specific: The script relies on the Windows registry and should only run on Windows systems.
+"""
 
-import _winreg as wreg
+import winreg as wreg
 import time
+import platform
 import common
 
 TARGET_APP = common.get_path("bin", "myapp.exe")
@@ -30,11 +41,15 @@ def write_reg_string(hive, key, value, data, delete=True):
 
     hkey.Close()
     pause()
-    print("")
 
 
 @common.dependencies(TARGET_APP)
 def main():
+    # Ensure script only runs on Windows
+    if platform.system() != 'Windows':
+        common.log("This script only runs on Windows.")
+        return common.UNSUPPORTED_RTA
+
     common.log("Suspicious Registry Persistence")
 
     for hive in (wreg.HKEY_LOCAL_MACHINE, wreg.HKEY_CURRENT_USER):
@@ -50,7 +65,7 @@ def main():
     wreg.SetValueEx(hkey, "Description", 0, wreg.REG_SZ, "A fake service")
     wreg.SetValueEx(hkey, "DisplayName", 0, wreg.REG_SZ, "ServiceTest Service")
     wreg.SetValueEx(hkey, "ImagePath", 0, wreg.REG_SZ, "c:\\ServiceTest.exe")
-    wreg.SetValueEx(hkey, "ServiceDLL", 0, wreg.REG_SZ, "C:\\ServiceTest.dll")
+    wreg.SetValueEx(hkey, "ServiceDLL", 0, wreg.REG_SZ, "c:\\ServiceTest.dll")
 
     # modify contents of ServiceDLL and ImagePath
     common.log("Modifying ServiceTest binary")

@@ -6,20 +6,26 @@
 import common
 import sys
 import os
+import platform
 
 MY_DOT_NET = common.get_path("bin", "mydotnet.exe")
 
 
 @common.dependencies(MY_DOT_NET)
 def main():
+    # Check if running on Windows
+    if platform.system() != 'Windows':
+        common.log("This script only runs on Windows.")
+        return common.UNSUPPORTED_RTA
+
     server, ip, port = common.serve_web()
     common.clear_web_cache()
 
     target_app = "mydotnet.exe"
     common.patch_file(MY_DOT_NET, common.wchar(":8000"), common.wchar(":%d" % port), target_file=target_app)
 
-    install_util64 = "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\InstallUtil.exe"
-    install_util86 = "C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\InstallUtil.exe"
+    install_util64 = "C:\\\\Windows\\\\Microsoft.NET\\\\Framework64\\\\v4.0.30319\\\\InstallUtil.exe"
+    install_util86 = "C:\\\\Windows\\\\Microsoft.NET\\\\Framework\\\\v4.0.30319\\\\InstallUtil.exe"
     fallback = False
 
     if os.path.exists(install_util64):

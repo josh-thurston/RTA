@@ -4,34 +4,33 @@
 # Description: Modifies the registry to persist a DLL on Office Startup.
 
 import common
-import _winreg as winreg
+import winreg as winreg
 import sys
 import time
+import platform
 
 key_dict = {winreg.HKEY_LOCAL_MACHINE: "HKLM", winreg.HKEY_CURRENT_USER: "HKCU"}
 
-def set_sleep_clear_key(key, subkey, name, value, value_type, delete_depth=0):
 
+def set_sleep_clear_key(key, subkey, name, value, value_type, delete_depth=0):
     try:
         hkey = winreg.CreateKey(key, subkey)
     except:
         common.log("Unable to open key. Likely a permissions error. Exiting")
         exit(common.ACCESS_DENIED)
 
-    common.log("Reading existing value from {}\\{}\\{}".format(key_dict[key], subkey, name))
+    common.log("Reading existing value from {}\\\\{}\\\\{}".format(key_dict[key], subkey, name))
     try:
-        # try to read key, will throw WindowsError if key doesn't exist
         old_value = winreg.QueryValueEx(hkey, name)[0]
         common.log("Saved original value: {}".format(old_value))
         key_existed = True
 
     except WindowsError:
-        common.log("Key/value doesn't exist. Will create.")
+        common.log("Key/value doesn’t exist. Will create.")
         key_existed = False
 
     common.log("Setting {} as value".format(value))
     try:
-        # try to write to key, will throw WindowsError if permissions are missing
         winreg.SetValueEx(hkey, name, 0, value_type, value)
     except WindowsError:
         common.log("Unable to write registry key. Likely a permissions error. Exiting")
@@ -54,13 +53,17 @@ def set_sleep_clear_key(key, subkey, name, value, value_type, delete_depth=0):
             common.log("Cleaning up, deleting key to depth {}".format(delete_depth))
             winreg.CloseKey(hkey)
             winreg.DeleteKey(key, subkey)
-            for i in range(-1, -1*delete_depth, -1):
+            for i in range(-1, -1 * delete_depth, -1):
                 winreg.DeleteKey(key, '\\'.join(subkey.split('\\')[:i]))
 
     time.sleep(2)
 
 
 def main(dll_location="c:\\windows\\temp\\evil.dll"):
+    # Check if running on Windows
+    if platform.system() != 'Windows':
+        common.log("This script only runs on Windows.")
+        return common.UNSUPPORTED_RTA
 
     # Write evil dll to office test path:
     subkey = "Software\\Microsoft\\Office Test\\Special\\Perf"
@@ -72,6 +75,7 @@ def main(dll_location="c:\\windows\\temp\\evil.dll"):
     set_sleep_clear_key(winreg.HKEY_CURRENT_USER, subkey, "CxmDll", 1, winreg.REG_DWORD, 0)
 
     return common.SUCCESS
+
 
 if __name__ == "__main__":
     exit(main(*sys.argv[1:]))

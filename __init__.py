@@ -4,6 +4,7 @@ import platform  # Add OS detection logic
 
 RED_TTP_PATH = os.path.dirname(os.path.abspath(__file__))
 
+
 def get_ttp_list(filter_by_os=True):
     """
     Returns a list of TTP scripts.
@@ -28,6 +29,7 @@ def get_ttp_list(filter_by_os=True):
             scripts.append(script)
 
     return scripts
+
 
 def get_ttp_names(filter_by_os=True):
     """

@@ -7,6 +7,7 @@ import platform  # Add OS check logic
 
 DELAY = 0
 
+
 def main():
     errors = []
     current_os = platform.system()  # Get the current OS

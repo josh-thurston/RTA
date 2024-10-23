@@ -43,9 +43,9 @@ python powershell_args.py
 ```
 
 To run an entire directory of RTAs, the easiest way is to use the script-runner provided, "run_rta.py". This script-runner is capable of running every script in the "red_ttp" subdirectory and will do so by default:
-"run_rta.py" has been updated to identify the platform/ OS and will only execute a script if it is on the correct platform. i.e. Windows script will not run on macOS or Linux etc.
+"run_all.py" and all other files have been updated to identify the platform/ OS and will only execute a script if it is on the correct platform. i.e. Windows script will not run on macOS or Linux etc.
 
 **All operating systems:**
 ```commandline
-python run_rta.py
+python run_all.py
 ```
